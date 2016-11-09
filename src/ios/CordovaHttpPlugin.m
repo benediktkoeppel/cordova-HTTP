@@ -36,6 +36,8 @@
         NSHTTPURLResponse *response = (NSHTTPURLResponse *)task.response;
         [dictionary setObject:[NSNumber numberWithInt:response.statusCode] forKey:@"status"];
         [dictionary setObject:response.allHeaderFields forKey:@"headers"];
+        NSURLRequest *currentRequest = (NSURLRequest *)task.currentRequest;
+        [dictionary setObject:currentRequest.URL.absoluteString forKey:@"currentRequestUrl"];
     }
 }
 
