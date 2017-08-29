@@ -14,7 +14,7 @@ function b64EncodeUnicode(str) {
 }
 
 function mergeHeaders(globalHeaders, localHeaders) {
-    var globalKeys = Object.keys(globalHeaders);
+    var globalKeys = globalHeaders ? Object.keys(globalHeaders) : [];
     var key;
     for (var i = 0; i < globalKeys.length; i++) {
         key = globalKeys[i];
@@ -27,6 +27,7 @@ function mergeHeaders(globalHeaders, localHeaders) {
 
 var http = {
     headers: {},
+    cacheResults: false,
     sslPinning: false,
     getBasicAuthHeader: function(username, password) {
         return {'Authorization': 'Basic ' + b64EncodeUnicode(username + ':' + password)};
@@ -36,6 +37,9 @@ var http = {
     },
     setHeader: function(header, value) {
         this.headers[header] = value;
+    },
+    setCacheResults: function(willCacheResults) {
+        this.cacheResults = willCacheResults;
     },
     enableSSLPinning: function(enable, success, failure) {
         return exec(success, failure, "CordovaHttpPlugin", "enableSSLPinning", [enable]);
@@ -50,9 +54,20 @@ var http = {
         headers = mergeHeaders(this.headers, headers);
         return exec(success, failure, "CordovaHttpPlugin", "post", [url, params, headers]);
     },
+    delete: function(url, params, headers, success, failure) {
+        headers = mergeHeaders(this.headers, headers);
+        return exec(success, failure, "CordovaHttpPlugin", "delete", [url, params, headers]);
+    },
+    put: function(url, params, headers, success, failure) {
+                return exec(success, failure, "CordovaHttpPlugin", "put", [url, params, headers]);
+    },
+    postJson: function(url, params, headers, success, failure) {
+        headers = mergeHeaders(this.headers, headers);
+        return exec(success, failure, "CordovaHttpPlugin", "postJson", [url, params, headers]);
+    },
     get: function(url, params, headers, success, failure) {
         headers = mergeHeaders(this.headers, headers);
-        return exec(success, failure, "CordovaHttpPlugin", "get", [url, params, headers]);
+        return exec(success, failure, "CordovaHttpPlugin", "get", [url, params, headers, this.cacheResults]);
     },
     head: function(url, params, headers, success, failure) {
         headers = mergeHeaders(this.headers, headers);
